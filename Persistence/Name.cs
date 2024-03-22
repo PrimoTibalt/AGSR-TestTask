@@ -13,6 +13,7 @@ namespace Persistence
 
 	public class Given
 	{
+		[Key]
 		public int Id { get; set; }
 		public string Text { get; set; }
 		public ICollection<Name> Names { get; set; }

@@ -1,5 +1,6 @@
 using Persistence;
 using Microsoft.EntityFrameworkCore;
+using Application.Mapping;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,7 +14,7 @@ builder.Services.AddDbContext<DataContext>(opt =>
 {
 	opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("PatientREST"));
 });
-
+builder.Services.AddAutoMapper(typeof(MappingProfiles).Assembly);
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

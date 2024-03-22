@@ -1,4 +1,5 @@
 ﻿using Application.ViewModels;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Persistence;
 
@@ -8,10 +9,17 @@ namespace PatientREST.Controllers
 	[Route("[controller]")]
 	public class PatientController : ControllerBase
 	{
+		private readonly IMapper _mapper;
+
+		public PatientController(IMapper mapper)
+		{
+			_mapper = mapper;
+		}
+
 		[HttpGet("{id:guid}")]
 		public ActionResult<PatientViewModel> Get(Guid id)
 		{
-			return Ok(new PatientViewModel
+			var patient = new PatientViewModel
 			{
 				Active = true,
 				BirthDate = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss"),
@@ -29,7 +37,11 @@ namespace PatientREST.Controllers
 					Id = id,
 					Use = "Unofficial",
 				}
-			});
+			};
+
+			var dbPatient = _mapper.Map<Patient>(patient);
+			patient = _mapper.Map<PatientViewModel>(dbPatient);
+			return Ok(patient);
 		}
 	}
 }
