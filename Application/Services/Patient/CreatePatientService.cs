@@ -27,13 +27,14 @@ namespace Application.Services.Patient
 				var givens = _dataContext.GivenName.Include(gn => gn.Given).Select(g => g.Given.Text).ToList();
 				var patientNew = _mapper.Map<Persistence.Patient>(viewModel);
 				var list = new List<GivenName>();
-				foreach (var gn in patientNew.Name.GivenNames)
+				patientNew.Name.GivenNames = new List<GivenName>();
+				foreach (var gn in viewModel.Name.Given)
 				{
 					var givenName = new GivenName { NameId = patientNew.NameId };
-					if (givens.Contains(gn.Given.Text))
-						givenName.Given = _dataContext.Given.First(g => g.Text == gn.Given.Text);
+					if (givens.Contains(gn))
+						givenName.Given = _dataContext.Given.First(g => g.Text == gn);
 					else
-						givenName.Given = new Given { Text = gn.Given.Text };
+						givenName.Given = new Given { Text = gn };
 
 					list.Add(givenName);
 				}
