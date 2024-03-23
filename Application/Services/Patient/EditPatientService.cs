@@ -10,52 +10,34 @@ namespace Application.Services.Patient
 	{
 		private readonly IMapper _mapper;
 		private readonly IMediator _mediator;
-		private readonly DataContext _dataContext;
 
-		public EditPatientService(IMapper mapper, IMediator mediator, DataContext dataContext)
+		public EditPatientService(IMapper mapper, IMediator mediator)
 		{
 			_mapper = mapper;
 			_mediator = mediator;
-			_dataContext = dataContext;
 		}
 
-		public bool TryEditPatient(Guid patientId, PatientViewModel viewModel, out Persistence.Patient patient)
+		public async Task<Persistence.Patient> EditPatient(Guid patientId, PatientViewModel viewModel)
 		{
 			try
 			{
 				var patientChanged = _mapper.Map<Persistence.Patient>(viewModel);
 				var patientUnchanged = _mediator.Send(new Details.Query { Id = patientId });
 				patientChanged.Name.GivenNames = new List<GivenName>();
-				var maxGivenId = _dataContext.Given.Max(g => g.Id);
 				foreach (var given in viewModel.Name.Given)
 				{
-					var item = _dataContext.Given.FirstOrDefault(g => g.Text == given);
-					var gn = new GivenName { NameId = patientChanged.NameId, Name = patientChanged.Name };
-					if (item is not null)
-					{
-						gn.GivenId = item.Id;
-						gn.Given = item;
-					}
-					else
-					{
-						gn.GivenId = ++maxGivenId;
-						gn.Given = new Given { Id = gn.GivenId, Text = given };
-						_dataContext.Given.Add(gn.Given);
-						_dataContext.SaveChanges();
-					}
-
+					var givenId = await _mediator.Send(new Givens.Create.Command { Text = given });
+					var gn = new GivenName { NameId = patientChanged.NameId, Name = patientChanged.Name, GivenId = givenId };
 					patientChanged.Name.GivenNames.Add(gn);
 				}
 
-				_mediator.Send(new Edit.Command { Id = patientId, Patient = patientChanged });
-				patient = patientChanged;
-				return true;
+				
+				return await _mediator.Send(new Edit.Command { Id = patientId, Patient = patientChanged });
 			}
 			catch (Exception ex)
 			{
 				Console.WriteLine(ex.Message);
-				patient = null;
-				return false;
+				return null;
 			}
 		}
 	}

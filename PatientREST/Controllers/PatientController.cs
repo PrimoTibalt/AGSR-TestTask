@@ -80,9 +80,10 @@ namespace PatientREST.Controllers
 		[Consumes("application/json")]
 		[ProducesResponseType(StatusCodes.Status201Created)]
 		[ProducesResponseType(StatusCodes.Status400BadRequest)]
-		public IActionResult Update(Guid id, PatientViewModel model)
+		public async Task<IActionResult> Update(Guid id, PatientViewModel model)
 		{
-			if (_editService.TryEditPatient(id, model, out Patient patient))
+			var patient = await _editService.EditPatient(id, model);
+			if (patient is not null)
 				return CreatedAtAction("Get", "Patient", new { id = patient.Id }, _mapper.Map<PatientViewModel>(patient));
 			else
 				return BadRequest();
