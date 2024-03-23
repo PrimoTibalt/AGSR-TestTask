@@ -4,11 +4,13 @@ using Application.ViewModels;
 using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using PatientREST.Binders;
+using PatientREST.Filters;
 using Persistence;
 
 namespace PatientREST.Controllers
 {
-	[Route("api/[controller]")]
+	[Route("api/patient")]
 	[Produces("application/json")]
 	public class PatientController : ControllerBase
 	{
@@ -34,6 +36,15 @@ namespace PatientREST.Controllers
 			if (patient is null) return NotFound();
 			var viewModel = _mapper.Map<PatientViewModel>(patient);
 			return Ok(viewModel);
+		}
+
+		[HttpGet(Name = "FilterBirthDate")]
+		[ProducesResponseType(StatusCodes.Status200OK)]
+		public async Task<ActionResult<List<PatientViewModel>>> GetByBirthDate([ModelBinder(typeof(DateFilterModelBinder))] List<DateFilter> birthDate)
+		{
+			var filters = birthDate.Select(FilterFunction).ToList();
+			var patients = await _mediator.Send(new List.Query { Filters = filters });
+			return _mapper.Map<List<PatientViewModel>>(patients);
 		}
 
 		[HttpGet("list", Name = "List")]
@@ -74,6 +85,11 @@ namespace PatientREST.Controllers
 				return CreatedAtAction("Get", "Patient", new { id = patient.Id }, _mapper.Map<PatientViewModel>(patient));
 			else
 				return BadRequest();
+		}
+
+		private static Func<IQueryable<Patient>, IQueryable<Patient>> FilterFunction(DateFilter dateFilter)
+		{
+			return (IQueryable<Patient> p) => DateFilter.ApplyDateFilter(p, dateFilter);
 		}
 	}
 }
