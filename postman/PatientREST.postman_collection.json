@@ -1,0 +1,322 @@
+{
+	"info": {
+		"_postman_id": "779166ab-36b0-45ce-ae16-37e3a31ec043",
+		"name": "PatientREST",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "10277738"
+	},
+	"item": [
+		{
+			"name": "Initial",
+			"item": [
+				{
+					"name": "BirthDateFiltering",
+					"item": [
+						{
+							"name": "Test Eq",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/patient?birthDate=eq2004-12",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"patient"
+									],
+									"query": [
+										{
+											"key": "birthDate",
+											"value": "eq2004-12"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Test Ne",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/patient?birthDate=ne2004-03-23",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"patient"
+									],
+									"query": [
+										{
+											"key": "birthDate",
+											"value": "ne2004-03-23"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Test gt",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/patient?birthDate=gt2004",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"patient"
+									],
+									"query": [
+										{
+											"key": "birthDate",
+											"value": "gt2004"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Test lt",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/patient?birthDate=lt2005-01-01",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"patient"
+									],
+									"query": [
+										{
+											"key": "birthDate",
+											"value": "lt2005-01-01"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Composite Test 1",
+							"request": {
+								"method": "GET",
+								"header": []
+							},
+							"response": []
+						},
+						{
+							"name": "Composite Test 2",
+							"request": {
+								"method": "GET",
+								"header": []
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Get Patient",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/patient/c7cb5672-4d41-44f7-b518-a05c39aef13d",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"patient",
+								"c7cb5672-4d41-44f7-b518-a05c39aef13d"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all patients",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/patient/list",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"patient",
+								"list"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Patient",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var moment = require(\"moment\");\r",
+									"\r",
+									"pm.environment.set('birthDate', moment().format('YYYY-MM-DDTHH:mm:ss'));"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\r\n    {\r\n        \"id\": \"{{$guid}}\",\r\n        \"use\": \"official\",\r\n        \"family\": \"Орлов\",\r\n        \"given\": [\r\n            \"Василий\",\r\n            \"Сергеевич\"\r\n            ]\r\n    },\r\n    \"gender\": \"male\",\r\n    \"birthDate\": \"2004-12-31T23:50:00\",\r\n    \"active\": true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/patient",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"patient"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Patient",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/patient/5C1EAA81-4831-4F6A-BC0D-2FA068B9BDAA",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"patient",
+								"5C1EAA81-4831-4F6A-BC0D-2FA068B9BDAA"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Edit Patient",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var moment = require(\"moment\");\r",
+									"\r",
+									"pm.environment.set('birthDate', moment().format('YYYY-MM-DDTHH:mm:ss'));"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": {\r\n        \"id\": \"cabc2aad-ce8b-4490-a121-f78fae7e4c33\",\r\n        \"use\": \"unofficial\",\r\n        \"family\": \"Przkevicz\",\r\n        \"given\": [\r\n            \"oli\",\r\n            \"-\",\r\n            \"colo\"\r\n        ]\r\n    },\r\n    \"gender\": \"male\",\r\n    \"birthDate\": \"2024-03-23T02:11:24\",\r\n    \"active\": true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/patient/c7cb5672-4d41-44f7-b518-a05c39aef13d",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"patient",
+								"c7cb5672-4d41-44f7-b518-a05c39aef13d"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": null,
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "url",
+			"value": "http://localhost:5000/api",
+			"type": "string"
+		},
+		{
+			"key": "DataForBirthDateFilteringRequests",
+			"value": "[\n    {\n        \"name\": {\n            \"id\": \"845378eb-03e9-4a23-9b10-62bbc0137e37\",\n            \"use\": \"official\",\n            \"family\": \"Орлов\",\n            \"given\": [\n                \"Генадий\",\n                \"Викторович\"\n            ]\n        },\n        \"gender\": \"male\",\n        \"birthDate\": \"2004-03-23T14:50:00\",\n        \"active\": true\n    },\n    {\n        \"name\": {\n            \"id\": \"e862de75-625b-48d0-a682-dc105bda5d39\",\n            \"use\": \"official\",\n            \"family\": \"Орлов\",\n            \"given\": [\n                \"Василий\",\n                \"Сергеевич\"\n            ]\n        },\n        \"gender\": \"male\",\n        \"birthDate\": \"2004-12-31T23:50:00\",\n        \"active\": true\n    },\n    {\n        \"name\": {\n            \"id\": \"12d7b7e0-774f-47bc-bc35-9091ceabf578\",\n            \"use\": \"unofficial\",\n            \"family\": \"Roberto\",\n            \"given\": [\n                \"Sivic\"\n            ]\n        },\n        \"gender\": \"male\",\n        \"birthDate\": \"2024-03-23T13:50:00\",\n        \"active\": true\n    }\n]",
+			"type": "string"
+		}
+	]
+}
