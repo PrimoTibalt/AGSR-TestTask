@@ -22,9 +22,6 @@ namespace Persistence
 			modelBuilder.Entity<Given>()
 				.HasKey(g => g.Id);
 
-			modelBuilder.Entity<Given>()
-				.HasAlternateKey(g => g.Text);
-
 			new GivenNameEntityTypeConfiguration().Configure(modelBuilder.Entity<GivenName>());
 		}
 		#endregion
@@ -40,6 +37,8 @@ namespace Persistence
 
 	public class GivenName
 	{
+		public Guid Id { get; set; }
+
 		public Guid NameId { get; set; }
 		public Name Name { get; set; }
 
@@ -51,7 +50,7 @@ namespace Persistence
 	{
 		public void Configure(EntityTypeBuilder<GivenName> builder)
 		{
-			builder.HasKey(gn => new { gn.NameId, gn.GivenId });
+			builder.HasKey(gn => new { gn.Id });
 
 			builder.HasOne(gn => gn.Name)
 				.WithMany(n => n.GivenNames)

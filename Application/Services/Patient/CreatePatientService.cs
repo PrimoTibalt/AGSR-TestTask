@@ -1,8 +1,6 @@
-﻿using Application.Patients;
-using Application.ViewModels;
+﻿using Application.ViewModels;
 using AutoMapper;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Persistence;
 
 namespace Application.Services.Patient
@@ -11,44 +9,38 @@ namespace Application.Services.Patient
 	{
 		private readonly IMapper _mapper;
 		private readonly IMediator _mediator;
-		private readonly DataContext _dataContext;
 
-		public CreatePatientService(IMapper mapper, IMediator mediator, DataContext dataContext)
+		public CreatePatientService(IMapper mapper, IMediator mediator)
 		{
 			_mapper = mapper;
 			_mediator = mediator;
-			_dataContext = dataContext;
 		}
 
-		public bool TryCreate(PatientViewModel viewModel, out Persistence.Patient patient)
+		public async Task<Persistence.Patient> CreateAsync(PatientViewModel viewModel)
 		{
 			try
 			{
-				var givens = _dataContext.GivenName.Include(gn => gn.Given).Select(g => g.Given.Text).ToList();
 				var patientNew = _mapper.Map<Persistence.Patient>(viewModel);
 				var list = new List<GivenName>();
 				patientNew.Name.GivenNames = new List<GivenName>();
 				foreach (var gn in viewModel.Name.Given)
 				{
-					var givenName = new GivenName { NameId = patientNew.NameId };
-					if (givens.Contains(gn))
-						givenName.Given = _dataContext.Given.First(g => g.Text == gn);
-					else
-						givenName.Given = new Given { Text = gn };
-
+					var givenName = new GivenName 
+					{
+						NameId = patientNew.NameId,
+						GivenId = await _mediator.Send(new Givens.Create.Command { Text = gn })
+					};
 					list.Add(givenName);
 				}
 
 				patientNew.Name.GivenNames = list;
-				_mediator.Send(new Create.Command { Patient = patientNew });
-				patient = patientNew;
-				return true;
+				await _mediator.Send(new Patients.Create.Command { Patient = patientNew });
+				return await _mediator.Send(new Patients.Details.Query { Id = patientNew.Id });
 			} 
 			catch (Exception ex)
 			{
 				Console.WriteLine(ex.Message);
-				patient = null;
-				return false;
+				return null;
 			}
 		}
 	}

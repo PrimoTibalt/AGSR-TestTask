@@ -59,9 +59,10 @@ namespace PatientREST.Controllers
 		[Consumes("application/json")]
 		[ProducesResponseType(StatusCodes.Status201Created)]
 		[ProducesResponseType(StatusCodes.Status400BadRequest)]
-		public IActionResult Create(PatientViewModel model)
+		public async Task<IActionResult> Create(PatientViewModel model)
 		{
-			if (_createService.TryCreate(model, out Patient patient))
+			var patient = await _createService.CreateAsync(model);
+			if (patient is not null)
 				return CreatedAtAction("Get", "Patient", new { id = patient.Id }, _mapper.Map<PatientViewModel>(patient));
 			else
 				return BadRequest();
