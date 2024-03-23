@@ -8,7 +8,7 @@ namespace Persistence
 		public Guid Id { get; set; }
 		public string Use { get; set; }
 		public string Family { get; set; }
-		public ICollection<Given> Given { get; set; }
+		public ICollection<GivenName> GivenNames { get; set; }
 	}
 
 	public class Given
@@ -16,6 +16,6 @@ namespace Persistence
 		[Key]
 		public int Id { get; set; }
 		public string Text { get; set; }
-		public ICollection<Name> Names { get; set; }
+		public ICollection<GivenName> NameAssociations { get; set; }
 	}
 }

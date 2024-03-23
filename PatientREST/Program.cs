@@ -1,10 +1,12 @@
 using Persistence;
 using Microsoft.EntityFrameworkCore;
 using Application.Mapping;
+using Application.Patients;
+using Application.Extension;
+using Microsoft.AspNetCore.Mvc;
 
+[assembly: ApiController]
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -15,6 +17,9 @@ builder.Services.AddDbContext<DataContext>(opt =>
 	opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("PatientREST"));
 });
 builder.Services.AddAutoMapper(typeof(MappingProfiles).Assembly);
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(List.Handler).Assembly));
+builder.Services.AddApplicationServices();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
