@@ -1,12 +1,13 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace PatientREST.Migrations
+namespace Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitialMigaration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -15,9 +16,9 @@ namespace PatientREST.Migrations
                 name: "Given",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Text = table.Column<string>(type: "TEXT", nullable: true)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Text = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -28,9 +29,9 @@ namespace PatientREST.Migrations
                 name: "Names",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Use = table.Column<string>(type: "TEXT", nullable: true),
-                    Family = table.Column<string>(type: "TEXT", nullable: false)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Use = table.Column<string>(type: "text", nullable: true),
+                    Family = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -41,12 +42,13 @@ namespace PatientREST.Migrations
                 name: "GivenName",
                 columns: table => new
                 {
-                    GivenId = table.Column<int>(type: "INTEGER", nullable: false),
-                    NamesId = table.Column<Guid>(type: "TEXT", nullable: false)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    NameId = table.Column<Guid>(type: "uuid", nullable: false),
+                    GivenId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_GivenName", x => new { x.GivenId, x.NamesId });
+                    table.PrimaryKey("PK_GivenName", x => x.Id);
                     table.ForeignKey(
                         name: "FK_GivenName_Given_GivenId",
                         column: x => x.GivenId,
@@ -54,8 +56,8 @@ namespace PatientREST.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_GivenName_Names_NamesId",
-                        column: x => x.NamesId,
+                        name: "FK_GivenName_Names_NameId",
+                        column: x => x.NameId,
                         principalTable: "Names",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -65,11 +67,11 @@ namespace PatientREST.Migrations
                 name: "Patients",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    NameId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Gender = table.Column<int>(type: "INTEGER", nullable: false),
-                    BirthDate = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Active = table.Column<bool>(type: "INTEGER", nullable: false)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    NameId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Gender = table.Column<int>(type: "integer", nullable: false),
+                    BirthDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Active = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -83,9 +85,14 @@ namespace PatientREST.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_GivenName_NamesId",
+                name: "IX_GivenName_GivenId",
                 table: "GivenName",
-                column: "NamesId");
+                column: "GivenId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GivenName_NameId",
+                table: "GivenName",
+                column: "NameId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Patients_NameId",

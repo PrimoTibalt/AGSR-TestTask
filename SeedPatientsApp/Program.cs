@@ -1,42 +1,35 @@
 ﻿using Application.ViewModels;
 using Persistence;
-using System.Text.Json;
+using Refit;
 
 namespace SeedPatientsApp
 {
 	class Program
 	{
-		static readonly HttpClient client = new HttpClient();
 		static async Task Main(string[] args)
 		{
-			var baseAddress = "http://localhost:5000/api/patient";
 			var tasks = new List<Task>();
 
 			foreach (var _ in Enumerable.Range(0, 100))
 			{
 				var patientData = GeneratePatientData();
-				var json = JsonSerializer.Serialize(patientData);
-				tasks.Add(PostDataAsync(baseAddress, json));
+				tasks.Add(PostDataAsync(patientData));
 			}
 
 			await Task.WhenAll(tasks);
 			Console.ReadLine();
 		}
 
-		static async Task PostDataAsync(string uri, string json)
+		static async Task PostDataAsync(PatientViewModel model)
 		{
-			var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+			var client = RestService.For<IPatientApi>("http://localhost:5000");
 			try
 			{
-				var response = await client.PostAsync(uri, content);
-				if (!response.IsSuccessStatusCode)
-				{
-					Console.WriteLine($"Failed to post data: {json}");
-				}
+				await client.Create(model);
 			}
-			catch (Exception)
+			catch (Exception e)
 			{
-				Console.WriteLine(json);
+				Console.WriteLine(e.Message);
 			}
 		}
 

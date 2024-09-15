@@ -19,7 +19,7 @@ namespace Application.Mapping
 				.ForMember(pv => pv.Gender, m => m.MapFrom(p => p.Gender.ToString().ToLowerInvariant()));
 
 			CreateMap<PatientViewModel, Patient>()
-				.ForMember(p => p.BirthDate, m => m.MapFrom(pv => DateTime.Parse(pv.BirthDate)))
+				.ForMember(p => p.BirthDate, m => m.MapFrom(pv => DateTime.SpecifyKind(DateTime.Parse(pv.BirthDate), DateTimeKind.Utc)))
 				.ForMember(p => p.Gender, m => m.MapFrom(pv => (Gender)Enum.Parse(typeof(Gender), pv.Gender, true)))
 				.ForMember(p => p.NameId, m => m.MapFrom(pv => pv.Name.Id))
 				.ForMember(p => p.Id, m => m.Ignore());

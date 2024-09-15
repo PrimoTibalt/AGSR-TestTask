@@ -67,7 +67,7 @@ namespace Persistence
 		public void Configure(EntityTypeBuilder<Patient> builder)
 		{
 			builder.HasKey(p => p.Id)
-			.HasName("PatientId");
+				.HasName("PatientId");
 
 			builder.HasOne(n => n.Name)
 				.WithOne()
